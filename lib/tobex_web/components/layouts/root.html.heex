@@ -8,11 +8,63 @@
       <%= assigns[:page_title] || "Home" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔜</text></svg>">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔜</text></svg>"
+    />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
   <body class="bg-white antialiased">
+    <header class="absolute inset-x-0 top-0 z-50 max-w-4xl mx-auto">
+      <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+        <div class="flex lg:flex-1">
+          <a href="/" class="font-semibold text-zinc-900 leading-6">
+            To Be X 🔜
+          </a>
+        </div>
+        <div class="flex flex-1 justify-end">
+          <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+            <%= if @current_user do %>
+              <li>
+                <.link
+                  href={~p"/lists"}
+                  class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+                >
+                  My lists
+                </.link>
+              </li>
+              <li>
+                <.link
+                  href={~p"/users/settings"}
+                  class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+                >
+                  Settings
+                </.link>
+              </li>
+              <li>
+                <.link
+                  href={~p"/logout"}
+                  method="delete"
+                  class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+                >
+                  Log out
+                </.link>
+              </li>
+            <% else %>
+              <li>
+                <.link
+                  href={~p"/login"}
+                  class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+                >
+                  Log in <span aria-hidden="true">&rarr;</span>
+                </.link>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </nav>
+    </header>
     <%= @inner_content %>
   </body>
 </html>
