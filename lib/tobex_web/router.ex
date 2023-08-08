@@ -18,6 +18,15 @@ defmodule TobexWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/home", PageController, :home
+    # TODO: Auth
+    # TODO: tobex routes
+  end
+
+  scope "/admin", TobexWeb do
+    pipe_through :browser
+
+    get "/", AdminController, :index
   end
 
   # Other scopes may use custom stacks.
