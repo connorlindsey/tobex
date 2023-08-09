@@ -5,12 +5,12 @@ defmodule TobexWeb.UserSettingsLive do
 
   def render(assigns) do
     ~H"""
-    <.header class="text-center">
+    <.header class="text-left">
       Account Settings
       <:subtitle>Manage your account email address and password settings</:subtitle>
     </.header>
 
-    <div class="space-y-12 divide-y max-w-lg mx-auto">
+    <div class="space-y-12 divide-y max-w-sm">
       <div>
         <.simple_form
           for={@email_form}

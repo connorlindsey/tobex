@@ -1,0 +1,10 @@
+<.header>
+  <%= @list.name %>
+  <:subtitle><%= @list.description %></:subtitle>
+  <pre><%= inspect(@list, pretty: true) %></pre>
+  <:actions>
+    <.link href={~p"/lists/#{@list}/edit"}>
+      <.button>Edit list</.button>
+    </.link>
+  </:actions>
+</.header>

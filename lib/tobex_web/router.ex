@@ -20,21 +20,23 @@ defmodule TobexWeb.Router do
   scope "/", TobexWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
     get "/home", PageController, :home
-    # TODO: tobex routes
+
+    pipe_through :redirect_if_user_is_authenticated
+    get "/", PageController, :home
+  end
+
+  scope "/", TobexWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    resources "/lists", ListController
   end
 
   scope "/admin", TobexWeb do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
     get "/", AdminController, :index
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", TobexWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:tobex, :dev_routes) do

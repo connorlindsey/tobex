@@ -1,0 +1,28 @@
+<.header>
+  Your Lists
+  <:actions>
+    <.link href={~p"/lists/new"}>
+      <.button>New List</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<%= if length(@lists) > 0 do %>
+  <.table id="lists" rows={@lists} row_click={&JS.navigate(~p"/lists/#{&1}")}>
+    <:col :let={list} label="Name"><%= list.name %></:col>
+    <:col :let={list} label="Description"><%= list.description %></:col>
+    <:action :let={list}>
+      <div class="sr-only">
+        <.link navigate={~p"/lists/#{list}"}>Show</.link>
+      </div>
+      <.link navigate={~p"/lists/#{list}/edit"}>Edit</.link>
+    </:action>
+    <:action :let={list}>
+      <.link href={~p"/lists/#{list}"} method="delete" data-confirm="Are you sure?">
+        Delete
+      </.link>
+    </:action>
+  </.table>
+<% else %>
+  <div class="mt-8 text-gray-600">You haven't made any lists yet.</div>
+<%end %>

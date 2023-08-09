@@ -8,6 +8,8 @@ defmodule Tobex.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
+    has_many :lists, Tobex.Library.List
+
     timestamps()
   end
 

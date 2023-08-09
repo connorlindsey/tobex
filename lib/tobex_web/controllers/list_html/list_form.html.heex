@@ -1,0 +1,16 @@
+<.simple_form :let={f} for={@changeset} action={@action} class="max-w-sm">
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:name]} type="text" label="Name" placeholder="To be x" />
+  <.input field={f[:description]} type="text" label="Description" />
+  <:actions>
+    <.button>Save list</.button>
+    <.link
+      navigate={~p"/lists"}
+      class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+    >
+      Cancel
+    </.link>
+  </:actions>
+</.simple_form>
