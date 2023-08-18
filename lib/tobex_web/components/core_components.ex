@@ -113,7 +113,7 @@ defmodule TobexWeb.CoreComponents do
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class={[
-        "fixed top-2 right-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
+        "fixed top-4 right-4 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
         @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
         @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
       ]}
@@ -332,7 +332,7 @@ defmodule TobexWeb.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-gray-400 focus:ring-0 sm:text-sm"
+        class="mt-1 block w-full py-2.5 rounded-md border border-gray-300 bg-white shadow-sm focus:border-gray-400 focus:ring-0 sm:text-sm"
         multiple={@multiple}
         {@rest}
       >

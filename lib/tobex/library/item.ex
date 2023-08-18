@@ -16,6 +16,6 @@ defmodule Tobex.Library.Item do
   def changeset(item, attrs) do
     item
     |> cast(attrs, [:name, :url, :status])
-    |> validate_required([:name, :status])
+    |> validate_required([:name, :status], message: "Required")
   end
 end

@@ -6,7 +6,7 @@ defmodule Tobex.Repo.Migrations.CreateItems do
       add :name, :string, null: false
       add :url, :string
       add :status, :string, null: false
-      add :list_id, references(:lists, on_delete: :nothing)
+      add :list_id, references(:lists, on_delete: :delete_all)
 
       timestamps()
     end

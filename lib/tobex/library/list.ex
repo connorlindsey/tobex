@@ -18,7 +18,7 @@ defmodule Tobex.Library.List do
   def changeset(list, attrs \\ %{}) do
     list
     |> cast(attrs, [:name, :description])
-    |> validate_required([:name])
+    |> validate_required([:name], message: "Please provide a name for the list")
     |> cast_assoc(:items, with: &Item.changeset/2)
   end
 end

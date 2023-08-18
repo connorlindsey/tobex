@@ -29,8 +29,12 @@ defmodule TobexWeb.Router do
   scope "/", TobexWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live "/lists/new", ListLive, :new
-    live "/lists/:id/edit", ListLive, :edit
+    live_session :default,
+      on_mount: [{TobexWeb.UserAuth, :ensure_authenticated}] do
+      live "/lists/new", ListLive, :new
+      live "/lists/:id/edit", ListLive, :edit
+    end
+
     resources "/lists", ListController, only: [:index, :show, :delete]
   end
 
