@@ -215,6 +215,7 @@ defmodule TobexWeb.CoreComponents do
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
   attr :type, :string, default: nil
+  attr :variant, :string, default: "primary", values: ~w(primary secondary danger)
   attr :class, :string, default: nil
   attr :rest, :global, include: ~w(disabled form name value)
 
@@ -225,8 +226,13 @@ defmodule TobexWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-primary-600 hover:bg-primary-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded-lg py-2 px-3 text-sm font-semibold leading-6",
+        @variant == "primary" &&
+          "bg-primary-600 hover:bg-primary-700 text-white active:text-white/80",
+        @variant == "secondary" &&
+          "bg-white hover:bg-gray-100 border border-gray-300 text-gray-600 active:text-gray-800",
+        @variant == "danger" &&
+          "bg-white hover:bg-red-100 border border-gray-300 text-gray-600 hover:text-red-600 active:text-red-800 hover:border-red-200",
         @class
       ]}
       {@rest}
@@ -402,7 +408,7 @@ defmodule TobexWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600 phx-no-feedback:hidden">
+    <p class="mt-3 flex gap-2 text-sm leading-6 text-rose-600 phx-no-feedback:hidden">
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>

@@ -7,10 +7,16 @@
   </:actions>
 </.header>
 
+<%!-- TODO: Update to grid and show items for each list --%>
 <%= if length(@lists) > 0 do %>
   <.table id="lists" rows={@lists} row_click={&JS.navigate(~p"/lists/#{&1}")}>
     <:col :let={list} label="Name"><%= list.name %></:col>
     <:col :let={list} label="Description"><%= list.description %></:col>
+    <:col :let={list} label="Items">
+      <%= if length(list.items) > 0,
+        do: Enum.map(list.items, & &1.name) |> Enum.join(", "),
+        else: 0 %>
+    </:col>
     <:action :let={list}>
       <div class="sr-only">
         <.link navigate={~p"/lists/#{list}"}>Show</.link>
@@ -25,4 +31,4 @@
   </.table>
 <% else %>
   <div class="mt-8 text-gray-600">You haven't made any lists yet.</div>
-<%end %>
+<% end %>

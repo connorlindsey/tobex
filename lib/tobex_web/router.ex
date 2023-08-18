@@ -29,7 +29,9 @@ defmodule TobexWeb.Router do
   scope "/", TobexWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    resources "/lists", ListController
+    live "/lists/new", ListLive, :new
+    live "/lists/:id/edit", ListLive, :edit
+    resources "/lists", ListController, only: [:index, :show, :delete]
   end
 
   scope "/admin", TobexWeb do

@@ -18,7 +18,7 @@ defmodule TobexWeb.UserSessionControllerTest do
       assert redirected_to(conn) == ~p"/lists"
 
       # Now do a logged in request and assert on the menu
-      conn = get(conn, ~p"/")
+      conn = get(conn, ~p"/lists")
       response = html_response(conn, 200)
       assert response =~ ~p"/users/settings"
       assert response =~ ~p"/logout"

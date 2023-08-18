@@ -48,7 +48,7 @@ defmodule TobexWeb.UserRegistrationLiveTest do
       assert redirected_to(conn) == ~p"/lists"
 
       # Now do a logged in request and assert on the menu
-      conn = get(conn, "/")
+      conn = get(conn, ~p"/lists")
       response = html_response(conn, 200)
       assert response =~ "Settings"
       assert response =~ "Log out"

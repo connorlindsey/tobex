@@ -3,8 +3,8 @@ defmodule TobexWeb.ListControllerTest do
 
   import Tobex.LibraryFixtures
 
-  @create_attrs %{name: "some name", description: "some description"}
-  @update_attrs %{name: "some updated name", description: "some updated description"}
+  @create_attrs %{name: "some name", description: "some description", items: []}
+  @update_attrs %{name: "some updated name", description: "some updated description", items: []}
   @invalid_attrs %{name: nil, description: nil}
 
   describe "index" do
