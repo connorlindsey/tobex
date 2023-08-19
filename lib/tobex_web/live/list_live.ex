@@ -6,14 +6,17 @@ defmodule TobexWeb.ListLive do
 
   def render(assigns) do
     ~H"""
-    <.simple_form for={@form} class="max-w-2xl" phx-submit="submit" phx-change="validate">
+    <.simple_form for={@form} class="" phx-submit="submit" phx-change="validate">
       <h2 class="text-base font-bold -mb-5">List</h2>
-      <.input field={@form[:name]} type="text" label="Name" placeholder="To be x" />
-      <.input field={@form[:description]} type="text" label="Description" />
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-6">
+        <.input field={@form[:name]} type="text" label="Name" placeholder="To be x" />
+        <.input field={@form[:description]} type="text" label="Description" />
+      </div>
       <fieldset>
         <legend class="text-base font-bold -mb-1">Items</legend>
         <div class="space-y-2">
           <.inputs_for :let={item_form} field={@form[:items]}>
+            <.input field={item_form[:id]} type="hidden" />
             <div class="flex flex-row items-start gap-2">
               <div class="grow -mt-1">
                 <.input field={item_form[:name]} type="text" label="Name" />
@@ -59,16 +62,12 @@ defmodule TobexWeb.ListLive do
     """
   end
 
-  # TODO: Handle edit in mount and events
-  # def mount(%{"id" => _id}, _session, socket) do
-  #   # Edit
-  #   # def edit(conn, %{"id" => id}) do
-  #   #   list = Library.get_list!(id)
-  #   #   changeset = Library.change_list(list)
-  #   #   render(conn, :edit, list: list, changeset: changeset)
-  #   # end
-  #   {:ok, socket}
-  # end
+  def mount(%{"id" => id}, _session, socket) do
+    list = Library.get_list!(id)
+    changeset = Library.change_list(list)
+
+    {:ok, assign(socket, form: to_form(changeset), list_id: id)}
+  end
 
   def mount(_params, _session, socket) do
     list_changeset =
@@ -76,7 +75,7 @@ defmodule TobexWeb.ListLive do
         items: []
       })
 
-    {:ok, assign(socket, :form, to_form(list_changeset))}
+    {:ok, assign(socket, form: to_form(list_changeset))}
   end
 
   def handle_event("add-item", _params, socket) do
@@ -108,8 +107,6 @@ defmodule TobexWeb.ListLive do
   end
 
   def handle_event("validate", %{"list" => list_params}, socket) do
-    IO.inspect(list_params)
-
     form =
       Library.change_list(%List{}, list_params)
       |> Map.put(:action, :validate)
@@ -119,29 +116,28 @@ defmodule TobexWeb.ListLive do
   end
 
   def handle_event("submit", %{"list" => list_params}, socket) do
-    case Library.create_list(socket.assigns.current_user, list_params) do
-      {:ok, list} ->
+    if socket.assigns.list_id do
+      with list <- Library.get_list!(socket.assigns.list_id),
+           {:ok, new_list} <- Library.update_list(list, list_params) do
         {:noreply,
          socket
-         |> put_flash(:info, "List created successfully,")
-         |> redirect(to: ~p"/lists/#{list}")}
+         |> put_flash(:info, "List updated successfully.")
+         |> redirect(to: ~p"/lists/#{new_list}")}
+      else
+        {:error, %Ecto.Changeset{} = changeset} ->
+          {:noreply, assign(socket, :form, to_form(Map.put(changeset, :action, :update)))}
+      end
+    else
+      case Library.create_list(socket.assigns.current_user, list_params) do
+        {:ok, list} ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "List created successfully.")
+           |> redirect(to: ~p"/lists/#{list}")}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :form, to_form(Map.put(changeset, :action, :insert)))}
+        {:error, %Ecto.Changeset{} = changeset} ->
+          {:noreply, assign(socket, :form, to_form(Map.put(changeset, :action, :insert)))}
+      end
     end
   end
-
-  # def update(conn, %{"id" => id, "list" => list_params}) do
-  #   list = Library.get_list!(id)
-
-  #   case Library.update_list(list, list_params) do
-  #     {:ok, list} ->
-  #       conn
-  #       |> put_flash(:info, "List updated successfully.")
-  #       |> redirect(to: ~p"/lists/#{list}")
-
-  #     {:error, %Ecto.Changeset{} = changeset} ->
-  #       render(conn, :edit, list: list, changeset: changeset)
-  #   end
-  # end
 end

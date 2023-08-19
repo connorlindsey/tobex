@@ -57,7 +57,7 @@ defmodule Tobex.Library do
   end
 
   @doc """
-  Updates a list.
+  Updates a list. Handled creating and deleting associated items.
 
   ## Examples
 
@@ -70,7 +70,7 @@ defmodule Tobex.Library do
   """
   def update_list(%List{} = list, attrs) do
     list
-    |> List.changeset(attrs)
+    |> change_list(attrs)
     |> Repo.update()
   end
 

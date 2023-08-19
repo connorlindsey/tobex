@@ -1,10 +1,31 @@
 <.header>
   <%= @list.name %>
   <:subtitle><%= @list.description %></:subtitle>
-  <pre><%= inspect(@list, pretty: true) %></pre>
   <:actions>
     <.link href={~p"/lists/#{@list}/edit"}>
       <.button>Edit list</.button>
     </.link>
   </:actions>
 </.header>
+<%= if length(@list.items) > 0  do %>
+  <ol class="list-decimal list-inside space-y-2 mt-4">
+    <%= for item <- @list.items do %>
+      <li class="text-sm space-x-2">
+        <%= if item.url do %>
+          <.link href={item.url} class="text-blue-600" target="_blank"><%= item.name %></.link>
+        <% else %>
+          <span><%= item.name %></span>
+        <% end %>
+        <span class={[
+          "badge",
+          item.status == "in_progress" && "badge-yellow",
+          item.status == "done" && "badge-green"
+        ]}>
+          <%= to_title(item.status) %>
+        </span>
+      </li>
+    <% end %>
+  </ol>
+<% else %>
+  <div class="text-sm text-gray-600">No items in this list.</div>
+<% end %>

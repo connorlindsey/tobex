@@ -9,7 +9,8 @@ defmodule Tobex.Library.List do
     field :description, :string
 
     belongs_to :user, Tobex.Accounts.User
-    has_many :items, Tobex.Library.Item
+    # Allow replacing items from the form by setting on_replace: :delete_if_exists
+    has_many :items, Tobex.Library.Item, on_replace: :delete_if_exists
 
     timestamps()
   end
