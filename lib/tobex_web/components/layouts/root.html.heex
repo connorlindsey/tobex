@@ -26,6 +26,14 @@
         <div class="flex flex-1 justify-end">
           <ul class="relative z-10 flex items-center gap-6 justify-end">
             <%= if @current_user do %>
+              <li :if={@current_user.role == :admin}>
+                <.link
+                  href={~p"/admin"}
+                  class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+                >
+                  Admin
+                </.link>
+              </li>
               <li>
                 <.link
                   href={~p"/lists"}

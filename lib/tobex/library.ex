@@ -22,6 +22,19 @@ defmodule Tobex.Library do
   end
 
   @doc """
+  Returns the list of lists for a user.
+
+  ## Examples
+
+      iex> list_lists_for_user(user_id)
+      [%List{}, ...]
+
+  """
+  def list_lists_for_user(user_id) do
+    Repo.all(from l in List, where: l.user_id == ^user_id) |> Repo.preload([:items])
+  end
+
+  @doc """
   Gets a single list.
 
   Raises `Ecto.NoResultsError` if the List does not exist.

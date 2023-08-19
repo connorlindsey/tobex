@@ -211,6 +211,21 @@ defmodule TobexWeb.UserAuth do
     end
   end
 
+  @doc """
+  Used for routes that require the user to be an admin.
+  """
+  def require_admin_user(conn, _opts) do
+    if conn.assigns[:current_user] && conn.assigns[:current_user].role == :admin do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must be an admin to access that page.")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/")
+      |> halt()
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)

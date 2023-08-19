@@ -116,7 +116,7 @@ defmodule TobexWeb.ListLive do
   end
 
   def handle_event("submit", %{"list" => list_params}, socket) do
-    if socket.assigns.list_id do
+    if socket.assigns.live_action == :edit && socket.assigns.list_id do
       with list <- Library.get_list!(socket.assigns.list_id),
            {:ok, new_list} <- Library.update_list(list, list_params) do
         {:noreply,
