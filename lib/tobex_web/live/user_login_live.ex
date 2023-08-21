@@ -8,7 +8,7 @@ defmodule TobexWeb.UserLoginLive do
         Sign in to your account
         <:subtitle>
           Don't have an account?
-          <.link navigate={~p"/register"} class="font-semibold text-primary-600 hover:underline">
+          <.link href={~p"/register"} class="font-semibold text-primary-600 hover:underline">
             Sign up
           </.link>
           for an account now.
@@ -20,10 +20,12 @@ defmodule TobexWeb.UserLoginLive do
         <.input field={@form[:password]} type="password" label="Password" required />
 
         <:actions>
-          <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
-          <.link href={~p"/users/reset_password"} class="text-sm font-semibold text-primary-600">
-            Forgot your password?
-          </.link>
+          <div class="flex flex-row justify-between w-full items-center">
+            <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
+            <.link href={~p"/users/reset_password"} class="text-sm font-semibold text-primary-600">
+              Forgot your password?
+            </.link>
+          </div>
         </:actions>
         <:actions>
           <.button phx-disable-with="Signing in..." class="w-full">

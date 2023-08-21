@@ -1,6 +1,42 @@
 <.flash_group flash={@flash} />
-<h1>Admin</h1>
-<%!-- 
-TODO: Implement admin page 
-- List all users and their lists
---%>
+<div class="space-y-12 lg:space-y-20">
+  <section>
+    <.header>
+      Users
+    </.header>
+    <%= if length(@users) > 0 do %>
+      <.table id="users" rows={@users}>
+        <:col :let={user} label="Email"><%= user.email %></:col>
+        <:col :let={user} label="Lists">
+          (<%= length(user.lists) %>) <%= if length(user.lists) > 0,
+            do: Enum.map(user.lists, & &1.name) |> Enum.join(", ") %>
+        </:col>
+      </.table>
+    <% else %>
+      <div class="mt-8 text-gray-600">No users found.</div>
+    <% end %>
+  </section>
+  <section>
+    <.header>
+      Lists
+    </.header>
+    <%= if length(@lists) > 0 do %>
+      <.table id="lists" rows={@lists}>
+        <:col :let={list} label="Name"><%= list.name %></:col>
+        <:col :let={list} label="Description">
+          <span class="line-clamp-3"><%= list.description %></span>
+        </:col>
+        <:col :let={list} label="Items">
+          <%= if length(list.items) > 0,
+            do: Enum.map(list.items, & &1.name) |> Enum.join(", "),
+            else: 0 %>
+        </:col>
+        <:col :let={list} label="Created by">
+          <%= list.user.email %>
+        </:col>
+      </.table>
+    <% else %>
+      <div class="mt-8 text-gray-600">No lists found.</div>
+    <% end %>
+  </section>
+</div>

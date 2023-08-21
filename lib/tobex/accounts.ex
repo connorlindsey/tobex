@@ -11,6 +11,13 @@ defmodule Tobex.Accounts do
   ## Database getters
 
   @doc """
+  Get all users.
+  """
+  def list_users do
+    Repo.all(User) |> Repo.preload([:lists])
+  end
+
+  @doc """
   Gets a user by email.
 
   ## Examples

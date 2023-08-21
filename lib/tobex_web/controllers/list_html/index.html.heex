@@ -11,7 +11,9 @@
 <%= if length(@lists) > 0 do %>
   <.table id="lists" rows={@lists} row_click={&JS.navigate(~p"/lists/#{&1}")}>
     <:col :let={list} label="Name"><%= list.name %></:col>
-    <:col :let={list} label="Description"><%= list.description %></:col>
+    <:col :let={list} label="Description">
+      <span class="line-clamp-3"><%= list.description %></span>
+    </:col>
     <:col :let={list} label="Items">
       <%= if length(list.items) > 0,
         do: Enum.map(list.items, & &1.name) |> Enum.join(", "),

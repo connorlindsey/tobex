@@ -11,7 +11,7 @@ defmodule TobexWeb.UserRegistrationLive do
         Register for an account
         <:subtitle>
           Already registered?
-          <.link navigate={~p"/login"} class="font-semibold text-primary-600 hover:underline">
+          <.link href={~p"/login"} class="font-semibold text-primary-600 hover:underline">
             Sign in
           </.link>
           to your account now.

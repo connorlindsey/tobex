@@ -18,7 +18,7 @@ defmodule Tobex.Library do
 
   """
   def list_lists do
-    Repo.all(List) |> Repo.preload([:items])
+    Repo.all(List) |> Repo.preload([:items, :user])
   end
 
   @doc """
