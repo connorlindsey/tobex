@@ -1,36 +1,40 @@
 <.header>
-  Your Lists
+  My Lists
   <:actions>
-    <.link href={~p"/lists/new"}>
-      <.button>New List</.button>
+    <.link
+      href={~p"/lists/new"}
+      class="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
+    >
+      <.icon name="hero-plus" class="h-4 w-4" /> New List
     </.link>
   </:actions>
 </.header>
 
-<%!-- TODO: Update to grid and show items for each list --%>
 <%= if length(@lists) > 0 do %>
-  <.table id="lists" rows={@lists} row_click={&JS.navigate(~p"/lists/#{&1}")}>
-    <:col :let={list} label="Name"><%= list.name %></:col>
-    <:col :let={list} label="Description">
-      <span class="line-clamp-3"><%= list.description %></span>
-    </:col>
-    <:col :let={list} label="Items">
-      <%= if length(list.items) > 0,
-        do: Enum.map(list.items, & &1.name) |> Enum.join(", "),
-        else: 0 %>
-    </:col>
-    <:action :let={list}>
-      <div class="sr-only">
-        <.link navigate={~p"/lists/#{list}"}>Show</.link>
-      </div>
-      <.link navigate={~p"/lists/#{list}/edit"}>Edit</.link>
-    </:action>
-    <:action :let={list}>
-      <.link href={~p"/lists/#{list}"} method="delete" data-confirm="Are you sure?">
-        Delete
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+    <%= for list <- @lists do %>
+      <.link
+        href={~p"/lists/#{list}"}
+        class="shadow-sm bg-white border border-gray-900/10 text-gray-600 pb-[24px] pt-2 px-4 rounded bg-opacity-50 bg-repeat-paper leading-6"
+      >
+        <h2 class="text-gray-900 font-semibold text-3xl leading-[40px]"><%= list.name %></h2>
+        <p class="line-clamp-2">
+          <%= list.description %>
+        </p>
+        <div class="mt-6">
+          <%= if length(list.items) > 0 do %>
+            <ol>
+              <%= for item <- list.items do %>
+                <li><%= item.status %> - <%= item.name %></li>
+              <% end %>
+            </ol>
+          <% else %>
+            <p>This list is empty.</p>
+          <% end %>
+        </div>
       </.link>
-    </:action>
-  </.table>
+    <% end %>
+  </div>
 <% else %>
   <div class="mt-8 text-gray-600">You haven't made any lists yet.</div>
 <% end %>

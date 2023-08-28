@@ -15,6 +15,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        gray: colors.slate,
         brand: "#FD4F00",
         primary: colors.emerald
       }

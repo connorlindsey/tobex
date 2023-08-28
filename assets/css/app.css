@@ -31,3 +31,7 @@
 .badge-pink {
  @apply text-pink-700 ring-pink-700/10;
 }
+
+.bg-repeat-paper {
+  background: repeating-linear-gradient(theme(colors.white), theme(colors.white) 23.5px, theme(colors.slate.200) 23.5px, theme(colors.slate.200) 24px);
+}

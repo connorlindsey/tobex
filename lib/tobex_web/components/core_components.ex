@@ -196,7 +196,7 @@ defmodule TobexWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-4 space-y-6 bg-white">
+      <div class="mt-4 space-y-6">
         <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-start gap-6">
           <%= render_slot(action, f) %>
@@ -332,7 +332,7 @@ defmodule TobexWeb.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-1 block w-full py-2.5 rounded-md border border-gray-300 bg-white shadow-sm focus:border-gray-400 focus:ring-0 sm:text-sm"
+        class="mt-1 block w-full py-2.5 rounded-md border border-gray-300 shadow-sm focus:border-gray-400 focus:ring-0 sm:text-sm"
         multiple={@multiple}
         {@rest}
       >
