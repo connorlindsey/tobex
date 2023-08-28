@@ -7,6 +7,7 @@
     </.link>
   </:actions>
 </.header>
+<%!-- TODO: Verify is URL before making link --%>
 <%= if length(@list.items) > 0  do %>
   <ol class="list-decimal list-inside space-y-2 mt-4">
     <%= for item <- @list.items do %>

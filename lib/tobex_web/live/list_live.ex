@@ -16,7 +16,8 @@ defmodule TobexWeb.ListLive do
         <legend class="text-base font-bold -mb-1">Items</legend>
         <div class="space-y-2">
           <.inputs_for :let={item_form} field={@form[:items]}>
-            <.input field={item_form[:id]} type="hidden" />
+            <%!-- Include the id field in the form for editing purposes --%>
+            <.input :if={item_form.data.id != nil} field={item_form[:id]} type="hidden" />
             <div class="flex flex-row items-start gap-2">
               <div class="grow -mt-1">
                 <.input field={item_form[:name]} type="text" label="Name" />
@@ -82,9 +83,13 @@ defmodule TobexWeb.ListLive do
     socket =
       update(socket, :form, fn %{source: changeset} ->
         existing_items = Ecto.Changeset.get_assoc(changeset, :items)
+        new_item = Library.change_item(%Item{})
+
+        IO.inspect(new_item, label: "new item")
+        IO.inspect(new_item.data, label: "new item data")
 
         changeset
-        |> Ecto.Changeset.change(items: existing_items ++ [Library.change_item(%Item{})])
+        |> Ecto.Changeset.change(items: existing_items ++ [new_item])
         |> to_form()
       end)
 
@@ -116,6 +121,9 @@ defmodule TobexWeb.ListLive do
   end
 
   def handle_event("submit", %{"list" => list_params}, socket) do
+    IO.puts("submit list")
+    IO.inspect(list_params)
+
     if socket.assigns.live_action == :edit && socket.assigns.list_id do
       with list <- Library.get_list!(socket.assigns.list_id),
            {:ok, new_list} <- Library.update_list(list, list_params) do
