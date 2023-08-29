@@ -2,6 +2,12 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+:root {
+  --paper-line-height: 28px;
+  --paper-line-width: 0.5px;
+  --paper-line-spacing: 27.5px;
+}
+
 /* This file is for your main application CSS */
 .badge {
   @apply inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10;
@@ -33,5 +39,6 @@
 }
 
 .bg-repeat-paper {
-  background: repeating-linear-gradient(theme(colors.white), theme(colors.white) 23.5px, theme(colors.slate.200) 23.5px, theme(colors.slate.200) 24px);
+  background: repeating-linear-gradient(theme(colors.white), theme(colors.white) var(--paper-line-spacing), theme(colors.slate.200) var(--paper-line-spacing), theme(colors.slate.200) var(--paper-line-height));
+  background-position: 0 -1px; /* Offset slightly to prevent double top border */
 }

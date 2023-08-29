@@ -13,26 +13,35 @@
 <%= if length(@lists) > 0 do %>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
     <%= for list <- @lists do %>
-      <.link
-        href={~p"/lists/#{list}"}
-        class="shadow-sm bg-white border border-gray-900/10 text-gray-600 pb-[24px] pt-2 px-4 rounded bg-opacity-50 bg-repeat-paper leading-6"
-      >
-        <h2 class="text-gray-900 font-semibold text-3xl leading-[40px]"><%= list.name %></h2>
-        <p class="line-clamp-2">
-          <%= list.description %>
-        </p>
-        <div class="mt-6">
+      <div class="shadow border rounded border-gray-900/10 bg-white text-gray-600 pb-paper-line pt-2 px-4 bg-opacity-50 bg-repeat-paper leading-paper-line">
+        <.link href={~p"/lists/#{list}"}>
+          <h2 class="text-gray-900 font-semibold text-2xl leading-paper-line-2x line-clamp-1 -mb-1">
+            <%= list.name %>
+          </h2>
+        </.link>
+        <p class="line-clamp-2"><%= list.description %></p>
+        <div class="mt-paper-line">
           <%= if length(list.items) > 0 do %>
             <ol>
               <%= for item <- list.items do %>
-                <li><%= item.status %> - <%= item.name %></li>
+                <li>
+                  <%= status_to_emoji(item.status) %>
+                  <%= if item.url && is_valid_url(item.url) do %>
+                    <a href={item.url} target="_blank" class="hover:underline">
+                      <%= item.name %>
+                      <.icon name="hero-arrow-top-right-on-square" class="h-4 w-4 -mt-1" />
+                    </a>
+                  <% else %>
+                    <%= item.name %>
+                  <% end %>
+                </li>
               <% end %>
             </ol>
           <% else %>
             <p>This list is empty.</p>
           <% end %>
         </div>
-      </.link>
+      </div>
     <% end %>
   </div>
 <% else %>

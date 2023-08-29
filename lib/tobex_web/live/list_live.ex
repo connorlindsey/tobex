@@ -4,62 +4,105 @@ defmodule TobexWeb.ListLive do
   alias Tobex.Library
   alias Tobex.Library.{List, Item}
 
+  # TODO: Auto-save
+  # Potential solution: https://janezurevc.name/real-time-auto-save-phoenix-liveview/
+  # Potential: Use phx-debunce on each input and save from validation (need to handle new vs. edit)
+  # Minimally show that changes were saved
   def render(assigns) do
     ~H"""
-    <.simple_form for={@form} class="" phx-submit="submit" phx-change="validate">
-      <h2 class="text-base font-bold -mb-5">List</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-6">
-        <.input field={@form[:name]} type="text" label="Name" placeholder="To be x" />
-        <.input field={@form[:description]} type="text" label="Description" />
-      </div>
-      <fieldset>
-        <legend class="text-base font-bold -mb-1">Items</legend>
-        <div class="space-y-2">
+    <.form
+      for={@form}
+      phx-submit="submit"
+      phx-change="validate"
+      class="shadow border rounded border-gray-900/10 bg-white text-gray-600 pb-paper-line pt-2 px-4 bg-opacity-50 bg-repeat-paper leading-paper-line"
+    >
+      <.inline_input
+        field={@form[:name]}
+        type="text"
+        label="Name"
+        placeholder="To be x"
+        class="text-2xl leading-paper-line-2x font-semibold text-gray-900"
+      />
+      <.inline_input
+        type="textarea"
+        field={@form[:description]}
+        label="Description"
+        placeholder="Description"
+        rows="2"
+        class="resize-none -mb-1.5"
+        phx-debounce="2000"
+      />
+      <fieldset class="mt-paper-line">
+        <div class="flex items-center justify-between">
+          <legend class="font-bold">Items</legend>
+          <button
+            variant="secondary"
+            type="button"
+            phx-click="add-item"
+            class="flex items-center gap-1 hover:text-gray-700 active:text-gray-900"
+          >
+            <.icon name="hero-plus" class="w-4 h-4" /> Add item
+          </button>
+        </div>
+        <div>
           <.inputs_for :let={item_form} field={@form[:items]}>
             <%!-- Include the id field in the form for editing purposes --%>
-            <.input :if={item_form.data.id != nil} field={item_form[:id]} type="hidden" />
-            <div class="flex flex-row items-start gap-2">
-              <div class="grow -mt-1">
-                <.input field={item_form[:name]} type="text" label="Name" />
-              </div>
-              <div class="grow -mt-1">
-                <.input field={item_form[:url]} type="text" label="URL" />
-              </div>
-              <div class="grow -mt-1">
-                <.input
+            <.inline_input :if={item_form.data.id != nil} field={item_form[:id]} type="hidden" />
+            <div class="flex flex-row items-start gap-2 relative">
+              <div class="flex-shrink-0">
+                <.inline_input
                   field={item_form[:status]}
                   type="select"
                   label="Status"
-                  options={[New: "new", "In Progress": "in_progress", Done: "done"]}
+                  options={["🆕 New": "new", "🟡 In Progress": "in_progress", "✅ Done": "done"]}
+                  class="pr-8"
                 />
               </div>
-              <.button
+              <div class="w-full">
+                <.inline_input field={item_form[:name]} type="text" label="Name" placeholder="Name" />
+              </div>
+              <div class="w-full">
+                <.inline_input
+                  field={item_form[:url]}
+                  type="text"
+                  label="URL"
+                  placeholder="URL (Optional)"
+                  class=""
+                />
+              </div>
+              <button
                 type="button"
-                variant="danger"
                 phx-click="delete-item"
                 phx-value-idx={item_form.index}
-                class="mt-6"
+                class="flex items-center justify-center hover:text-red-500 active:text-red-800 mt-1.5"
               >
                 <.icon name="hero-trash" class="w-4 h-4" />
                 <span class="sr-only">Delete item</span>
-              </.button>
+              </button>
             </div>
           </.inputs_for>
-          <.button class="mt-2 w-full" variant="secondary" type="button" phx-click="add-item">
-            Add item
-          </.button>
         </div>
       </fieldset>
-      <:actions>
-        <.button phx-disable-with="Saving...">Save list</.button>
+      <div class="flex items-center justify-between mt-paper-line pt-0.5">
+        <div class="flex items-center gap-x-4 -ml-3">
+          <.button variant="inline" phx-disable-with="Saving...">Save list</.button>
+          <.link
+            navigate={~p"/lists"}
+            class="text-sm font-semibold leading-6 text-gray-500 hover:text-gray-700"
+          >
+            Cancel
+          </.link>
+        </div>
         <.link
-          navigate={~p"/lists"}
-          class="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-700"
+          :if={@form.data.id != nil}
+          href={~p"/lists/#{@form.data.id}"}
+          method="DELETE"
+          class="text-sm font-semibold leading-6 text-gray-500 hover:text-gray-700"
         >
-          Cancel
+          Delete list
         </.link>
-      </:actions>
-    </.simple_form>
+      </div>
+    </.form>
     """
   end
 
@@ -72,9 +115,8 @@ defmodule TobexWeb.ListLive do
 
   def mount(_params, _session, socket) do
     list_changeset =
-      Library.change_list(%List{
-        items: []
-      })
+      Library.change_list(%List{})
+      |> Ecto.Changeset.change(items: [Library.change_item(%Item{})])
 
     {:ok, assign(socket, form: to_form(list_changeset))}
   end
@@ -84,6 +126,8 @@ defmodule TobexWeb.ListLive do
       update(socket, :form, fn %{source: changeset} ->
         existing_items = Ecto.Changeset.get_assoc(changeset, :items)
 
+        IO.inspect(existing_items, label: "Add item - existing Items")
+
         changeset
         |> Ecto.Changeset.change(items: existing_items ++ [Library.change_item(%Item{})])
         |> to_form()
@@ -92,6 +136,7 @@ defmodule TobexWeb.ListLive do
     {:noreply, socket}
   end
 
+  # TODO: Fix deleting multiple items consecutively (only affects edit)
   def handle_event("delete-item", %{"idx" => idx}, socket) do
     idx = String.to_integer(idx)
 

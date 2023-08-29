@@ -32,10 +32,11 @@ defmodule TobexWeb.Router do
     live_session :default,
       on_mount: [{TobexWeb.UserAuth, :ensure_authenticated}] do
       live "/lists/new", ListLive, :new
+      live "/lists/:id/", ListLive, :edit
       live "/lists/:id/edit", ListLive, :edit
     end
 
-    resources "/lists", ListController, only: [:index, :show, :delete]
+    resources "/lists", ListController, only: [:index, :delete]
   end
 
   scope "/admin", TobexWeb do

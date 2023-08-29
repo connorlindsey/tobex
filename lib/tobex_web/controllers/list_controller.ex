@@ -11,10 +11,6 @@ defmodule TobexWeb.ListController do
     render(conn, :index, lists: lists)
   end
 
-  def show(conn, _params) do
-    render(conn, :show, list: conn.assigns[:list])
-  end
-
   def delete(conn, _params) do
     {:ok, _list} = Library.delete_list(conn.assigns[:list])
 

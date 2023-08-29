@@ -18,7 +18,15 @@ module.exports = {
         gray: colors.slate,
         brand: "#FD4F00",
         primary: colors.emerald
-      }
+      },
+      spacing: {
+        ["paper-line"]: "calc(var(--paper-line-height) + .5px)",
+        ["paper-line-2x"]: "calc(var(--paper-line-height) * 2 + 1px)",
+      },
+      lineHeight: {
+        ["paper-line"]: "calc(var(--paper-line-height))",
+        ["paper-line-2x"]: "calc(var(--paper-line-height) * 2 - 4px)",
+      },
     },
   },
   plugins: [

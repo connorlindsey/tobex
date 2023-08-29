@@ -215,7 +215,7 @@ defmodule TobexWeb.CoreComponents do
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
   attr :type, :string, default: nil
-  attr :variant, :string, default: "primary", values: ~w(primary secondary danger)
+  attr :variant, :string, default: "primary", values: ~w(primary secondary danger inline)
   attr :class, :string, default: nil
   attr :rest, :global, include: ~w(disabled form name value)
 
@@ -233,6 +233,8 @@ defmodule TobexWeb.CoreComponents do
           "bg-white hover:bg-gray-100 border border-gray-300 text-gray-600 active:text-gray-800",
         @variant == "danger" &&
           "bg-white hover:bg-red-100 border border-gray-300 text-gray-600 hover:text-red-600 active:text-red-800 hover:border-red-200",
+        @variant == "inline" &&
+          "font-semibold leading-6 text-gray-900 hover:text-gray-700 py-0",
         @class
       ]}
       {@rest}
@@ -410,6 +412,184 @@ defmodule TobexWeb.CoreComponents do
     ~H"""
     <p class="mt-3 flex gap-2 text-sm leading-6 text-rose-600 phx-no-feedback:hidden">
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+      <%= render_slot(@inner_block) %>
+    </p>
+    """
+  end
+
+  @doc """
+  Renders an inline input with label and error messages.
+
+  A `Phoenix.HTML.FormField` may be passed as argument,
+  which is used to retrieve the input name, id, and values.
+  Otherwise all attributes may be passed explicitly.
+
+  ## Types
+
+  This function accepts all HTML input types, considering that:
+
+    * You may also set `type="select"` to render a `<select>` tag
+
+    * `type="checkbox"` is used exclusively to render boolean values
+
+    * For live file uploads, see `Phoenix.Component.live_file_input/1`
+
+  See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
+  for more information.
+
+  ## Examples
+
+      <.input field={@form[:email]} type="email" />
+      <.input name="my-input" errors={["oh no!"]} />
+  """
+  attr :id, :any, default: nil
+  attr :name, :any
+  attr :label, :string, default: nil
+  attr :value, :any
+  attr :class, :string, default: ""
+
+  attr :type, :string,
+    default: "text",
+    values: ~w(checkbox color date datetime-local email file hidden month number password
+               range radio search select tel text textarea time url week)
+
+  attr :field, Phoenix.HTML.FormField,
+    doc: "a form field struct retrieved from the form, for example: @form[:email]"
+
+  attr :errors, :list, default: []
+  attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
+  attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
+  attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
+  attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+
+  attr :rest, :global,
+    include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
+                multiple pattern placeholder readonly required rows size step)
+
+  slot :inner_block
+
+  def inline_input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
+    assigns
+    |> assign(field: nil, id: assigns.id || field.id)
+    |> assign(:errors, Enum.map(field.errors, &translate_error(&1)))
+    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
+    |> assign_new(:value, fn -> field.value end)
+    |> inline_input()
+  end
+
+  def inline_input(%{type: "checkbox", value: value} = assigns) do
+    assigns =
+      assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", value) end)
+
+    ~H"""
+    <div phx-feedback-for={@name}>
+      <label class="flex items-center gap-2 text-sm leading-paper-line text-gray-600">
+        <input type="hidden" name={@name} value="false" />
+        <input
+          type="checkbox"
+          id={@id}
+          name={@name}
+          value="true"
+          checked={@checked}
+          class="rounded border-gray-300 text-gray-900 focus:ring-0"
+          {@rest}
+        />
+        <span class="sr-only"><%= @label %></span>
+      </label>
+      <.inline_error :for={msg <- @errors}><%= msg %></.inline_error>
+    </div>
+    """
+  end
+
+  def inline_input(%{type: "select"} = assigns) do
+    ~H"""
+    <div phx-feedback-for={@name}>
+      <.inline_label for={@id}><%= @label %></.inline_label>
+      <select
+        id={@id}
+        name={@name}
+        class={[
+          "block w-full p-0 m-0 border-none bg-transparent focus:ring-0 leading-paper-line",
+          @errors == [] && "",
+          @errors != [] && "text-rose-400 focus:text-rose-400",
+          @class
+        ]}
+        multiple={@multiple}
+        {@rest}
+      >
+        <option :if={@prompt} value=""><%= @prompt %></option>
+        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+      </select>
+      <.inline_error :for={msg <- @errors}><%= msg %></.inline_error>
+    </div>
+    """
+  end
+
+  def inline_input(%{type: "textarea"} = assigns) do
+    ~H"""
+    <div phx-feedback-for={@name}>
+      <.inline_label for={@id}><%= @label %></.inline_label>
+      <textarea
+        id={@id}
+        name={@name}
+        class={[
+          "block w-full text-gray-900 focus:ring-0 leading-paper-line border-none bg-transparent p-0 m-0",
+          @errors == [] && "",
+          @errors != [] && "text-rose-400 focus:text-rose-400",
+          @class
+        ]}
+        {@rest}
+      ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
+      <.inline_error :for={msg <- @errors}><%= msg %></.inline_error>
+    </div>
+    """
+  end
+
+  # All other inputs text, datetime-local, url, password, etc. are handled here...
+  def inline_input(assigns) do
+    ~H"""
+    <div phx-feedback-for={@name}>
+      <.inline_label for={@id}><%= @label %></.inline_label>
+      <input
+        type={@type}
+        name={@name}
+        id={@id}
+        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+        class={[
+          "block w-full text-gray-900 focus:ring-0 leading-paper-line border-none bg-transparent p-0 m-0",
+          @errors == [] && "",
+          @errors != [] && "text-rose-400 focus:text-rose-400",
+          @class
+        ]}
+        {@rest}
+      />
+      <.inline_error :for={msg <- @errors}><%= msg %></.inline_error>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a label.
+  """
+  attr :for, :string, default: nil
+  slot :inner_block, required: true
+
+  def inline_label(assigns) do
+    ~H"""
+    <label for={@for} class="sr-only">
+      <%= render_slot(@inner_block) %>
+    </label>
+    """
+  end
+
+  @doc """
+  Generates a generic error message.
+  """
+  slot :inner_block, required: true
+
+  def inline_error(assigns) do
+    ~H"""
+    <p class="flex mt-0.5 items-center gap-1.5 text-sm text-rose-600 phx-no-feedback:hidden">
       <%= render_slot(@inner_block) %>
     </p>
     """
