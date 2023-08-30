@@ -20,6 +20,12 @@ defmodule Tobex.Library.List do
     list
     |> cast(attrs, [:name, :description])
     |> validate_required([:name], message: "Please provide a name for the list")
-    |> cast_assoc(:items, with: &Item.changeset/2)
+    |> cast_assoc(:items,
+      with: &Item.changeset/2,
+      # Support adding and removing items from the list in a one-to-many form
+      # https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3-sorting-and-deleting-from-many-collections
+      sort_param: :items_sort,
+      drop_param: :items_drop
+    )
   end
 end
